@@ -5,9 +5,9 @@
 typedef struct Voo
 {
     char numero[10];
-    char companhiaAerea[50]; // NOVO: Campo para a companhia aérea
+    char companhiaAerea[50];
     char destino[50];
-    char horario[6]; // formato HH:MM
+    char horario[6];
     char status[20];
     struct Voo *ant;
     struct Voo *prox;
@@ -16,7 +16,6 @@ typedef struct Voo
 Voo *inicio = NULL;
 Voo *fim = NULL;
 
-// ALTERADO: Adicionado o parâmetro 'companhiaAerea'
 Voo *criarVoo(char numero[], char companhiaAerea[], char destino[], char horario[], char status[])
 {
     Voo *novo = (Voo *)malloc(sizeof(Voo));
@@ -26,7 +25,7 @@ Voo *criarVoo(char numero[], char companhiaAerea[], char destino[], char horario
         exit(1);
     }
     strcpy(novo->numero, numero);
-    strcpy(novo->companhiaAerea, companhiaAerea); // NOVO: Copia a companhia
+    strcpy(novo->companhiaAerea, companhiaAerea);
     strcpy(novo->destino, destino);
     strcpy(novo->horario, horario);
     strcpy(novo->status, status);
@@ -35,10 +34,8 @@ Voo *criarVoo(char numero[], char companhiaAerea[], char destino[], char horario
     return novo;
 }
 
-// ALTERADO: Adicionado o parâmetro 'companhiaAerea'
 void adicionarVoo(char numero[], char companhiaAerea[], char destino[], char horario[], char status[])
 {
-    // ALTERADO: Passa o novo parâmetro para criarVoo
     Voo *novo = criarVoo(numero, companhiaAerea, destino, horario, status);
     if (inicio == NULL)
     {
@@ -50,7 +47,6 @@ void adicionarVoo(char numero[], char companhiaAerea[], char destino[], char hor
         novo->ant = fim;
         fim = novo;
     }
-    printf("Voo adicionado com sucesso!\n");
 }
 
 void removerVoo(char numero[])
@@ -65,17 +61,14 @@ void removerVoo(char numero[])
         printf("Voo não encontrado.\n");
         return;
     }
-
     if (atual->ant != NULL)
         atual->ant->prox = atual->prox;
     else
         inicio = atual->prox;
-
     if (atual->prox != NULL)
         atual->prox->ant = atual->ant;
     else
         fim = atual->ant;
-
     free(atual);
     printf("Voo removido com sucesso.\n");
 }
@@ -104,11 +97,9 @@ void exibirVoos()
         printf("Nenhum voo registrado.\n");
         return;
     }
-
     printf("\n--- Painel de Voos (Ordem de Inserção) ---\n");
     while (atual != NULL)
     {
-        // ALTERADO: Adicionado 'companhiaAerea' na exibição
         printf("Voo: %s | Companhia: %s | Destino: %s | Horário: %s | Status: %s\n",
                atual->numero, atual->companhiaAerea, atual->destino, atual->horario, atual->status);
         atual = atual->prox;
@@ -123,41 +114,40 @@ void exibirVoosInverso()
         printf("Nenhum voo registrado.\n");
         return;
     }
-
     printf("\n--- Painel de Voos (Ordem Reversa) ---\n");
     while (atual != NULL)
     {
-        // ALTERADO: Adicionado 'companhiaAerea' na exibição
         printf("Voo: %s | Companhia: %s | Destino: %s | Horário: %s | Status: %s\n",
                atual->numero, atual->companhiaAerea, atual->destino, atual->horario, atual->status);
         atual = atual->ant;
     }
 }
 
+void exibirPorStatus(char statusBusca[])
+{
+    Voo *atual = inicio;
+    int encontrados = 0;
+    printf("\n--- Voos com Status: '%s' ---\n", statusBusca);
+    while (atual != NULL)
+    {
+        if (strcmp(atual->status, statusBusca) == 0)
+        {
+            printf("Voo: %s | Companhia: %s | Destino: %s | Horário: %s | Status: %s\n",
+                   atual->numero, atual->companhiaAerea, atual->destino, atual->horario, atual->status);
+            encontrados = 1;
+        }
+        atual = atual->prox;
+    }
+    if (encontrados == 0)
+    {
+        printf("Nenhum voo encontrado com este status.\n");
+    }
+}
+
 // --- Funções de Comparação ---
-
-int compararNumero(const void *a, const void *b)
-{
-    Voo *v1 = *(Voo **)a;
-    Voo *v2 = *(Voo **)b;
-    return strcmp(v1->numero, v2->numero);
-}
-
-// NOVO: Função para comparar por companhia aérea
-int compararCompanhia(const void *a, const void *b)
-{
-    Voo *v1 = *(Voo **)a;
-    Voo *v2 = *(Voo **)b;
-    return strcmp(v1->companhiaAerea, v2->companhiaAerea);
-}
-
-int compararDestino(const void *a, const void *b)
-{
-    Voo *v1 = *(Voo **)a;
-    Voo *v2 = *(Voo **)b;
-    return strcmp(v1->destino, v2->destino);
-}
-
+int compararNumero(const void *a, const void *b) { return strcmp((*(Voo **)a)->numero, (*(Voo **)b)->numero); }
+int compararCompanhia(const void *a, const void *b) { return strcmp((*(Voo **)a)->companhiaAerea, (*(Voo **)b)->companhiaAerea); }
+int compararDestino(const void *a, const void *b) { return strcmp((*(Voo **)a)->destino, (*(Voo **)b)->destino); }
 int compararHorario(const void *a, const void *b)
 {
     Voo *v1 = *(Voo **)a;
@@ -165,12 +155,15 @@ int compararHorario(const void *a, const void *b)
     int h1 = 0, m1 = 0, h2 = 0, m2 = 0;
     sscanf(v1->horario, "%d:%d", &h1, &m1);
     sscanf(v2->horario, "%d:%d", &h2, &m2);
-    int total_minutos1 = h1 * 60 + m1;
-    int total_minutos2 = h2 * 60 + m2;
-    return total_minutos1 - total_minutos2;
+    return (h1 * 60 + m1) - (h2 * 60 + m2);
+}
+// NOVO: Função para comparar por status (para ordenação)
+int compararStatus(const void *a, const void *b)
+{
+    return strcmp((*(Voo **)a)->status, (*(Voo **)b)->status);
 }
 
-// ALTERADO: Adicionado critério 4 para companhia aérea
+// ALTERADO: Adicionado critério 5 para ordenação por Status
 void exibirOrdenado(int criterio, int ordem)
 {
     int count = 0;
@@ -180,20 +173,17 @@ void exibirOrdenado(int criterio, int ordem)
         count++;
         atual = atual->prox;
     }
-
     if (count == 0)
     {
         printf("Nenhum voo registrado.\n");
         return;
     }
-
     Voo **vetor = (Voo **)malloc(count * sizeof(Voo *));
     if (vetor == NULL)
     {
         printf("Erro de alocação de memória!\n");
         return;
     }
-
     atual = inicio;
     for (int i = 0; i < count; i++)
     {
@@ -208,7 +198,7 @@ void exibirOrdenado(int criterio, int ordem)
         printf("\n--- Voos Ordenados por Número ---\n");
         break;
     case 2:
-        qsort(vetor, count, sizeof(Voo *), compararCompanhia); // NOVO: Chamada para o comparador
+        qsort(vetor, count, sizeof(Voo *), compararCompanhia);
         printf("\n--- Voos Ordenados por Companhia Aérea ---\n");
         break;
     case 3:
@@ -219,6 +209,11 @@ void exibirOrdenado(int criterio, int ordem)
         qsort(vetor, count, sizeof(Voo *), compararHorario);
         printf("\n--- Voos Ordenados por Horário ---\n");
         break;
+    // NOVO: Case para a ordenação por status
+    case 5:
+        qsort(vetor, count, sizeof(Voo *), compararStatus);
+        printf("\n--- Voos Ordenados por Status ---\n");
+        break;
     default:
         printf("Critério de ordenação inválido.\n");
         free(vetor);
@@ -226,24 +221,21 @@ void exibirOrdenado(int criterio, int ordem)
     }
 
     if (ordem == 2)
-    { // Ordem decrescente
+    {
         for (int i = count - 1; i >= 0; i--)
         {
-            // ALTERADO: Adicionado 'companhiaAerea' na exibição
             printf("Voo: %s | Companhia: %s | Destino: %s | Horário: %s | Status: %s\n",
                    vetor[i]->numero, vetor[i]->companhiaAerea, vetor[i]->destino, vetor[i]->horario, vetor[i]->status);
         }
     }
     else
-    { // Ordem crescente
+    {
         for (int i = 0; i < count; i++)
         {
-            // ALTERADO: Adicionado 'companhiaAerea' na exibição
             printf("Voo: %s | Companhia: %s | Destino: %s | Horário: %s | Status: %s\n",
                    vetor[i]->numero, vetor[i]->companhiaAerea, vetor[i]->destino, vetor[i]->horario, vetor[i]->status);
         }
     }
-
     free(vetor);
 }
 
@@ -260,16 +252,14 @@ void liberarMemoria()
     inicio = fim = NULL;
 }
 
-// Menu principal
 int main()
 {
     int opcao, ordem;
-    // NOVO: Adicionada variável para companhiaAerea
     char numero[10], companhiaAerea[50], destino[50], horario[6], status[20];
 
     do
     {
-        // ALTERADO: Menu com nova opção de ordenação
+        // ALTERADO: Menu com a nova opção de ordenação e filtro
         printf("\n========== Painel de Aeroporto ==========\n");
         printf("1. Adicionar Voo\n");
         printf("2. Remover Voo\n");
@@ -278,14 +268,15 @@ int main()
         printf("5. Exibir Todos os Voos (Ordem Reversa)\n");
         printf("-----------------------------------------\n");
         printf("6. Exibir Voos Ordenados por Número\n");
-        printf("7. Exibir Voos Ordenados por Companhia Aérea\n"); // NOVO
+        printf("7. Exibir Voos Ordenados por Companhia Aérea\n");
         printf("8. Exibir Voos Ordenados por Destino\n");
         printf("9. Exibir Voos Ordenados por Horário\n");
+        printf("10. Exibir Voos Ordenados por Status\n"); // NOVO (Ordenação)
         printf("-----------------------------------------\n");
         printf("0. Sair\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
-        getchar(); // limpar o buffer
+        getchar();
 
         switch (opcao)
         {
@@ -293,89 +284,57 @@ int main()
             printf("Número do Voo: ");
             fgets(numero, sizeof(numero), stdin);
             numero[strcspn(numero, "\n")] = '\0';
-
-            // NOVO: Pede a companhia aérea ao usuário
             printf("Companhia Aérea: ");
             fgets(companhiaAerea, sizeof(companhiaAerea), stdin);
             companhiaAerea[strcspn(companhiaAerea, "\n")] = '\0';
-
             printf("Destino: ");
             fgets(destino, sizeof(destino), stdin);
             destino[strcspn(destino, "\n")] = '\0';
-
             printf("Horário (HH:MM): ");
             fgets(horario, sizeof(horario), stdin);
             horario[strcspn(horario, "\n")] = '\0';
-
             printf("Status: ");
             fgets(status, sizeof(status), stdin);
             status[strcspn(status, "\n")] = '\0';
-
-            // ALTERADO: Passa a companhia para a função
             adicionarVoo(numero, companhiaAerea, destino, horario, status);
             break;
-
         case 2:
             printf("Número do Voo a remover: ");
             fgets(numero, sizeof(numero), stdin);
             numero[strcspn(numero, "\n")] = '\0';
             removerVoo(numero);
             break;
-
         case 3:
             printf("Número do Voo: ");
             fgets(numero, sizeof(numero), stdin);
             numero[strcspn(numero, "\n")] = '\0';
-
             printf("Novo Status: ");
             fgets(status, sizeof(status), stdin);
             status[strcspn(status, "\n")] = '\0';
-
             atualizarStatus(numero, status);
             break;
-
         case 4:
             exibirVoos();
             break;
-
         case 5:
             exibirVoosInverso();
             break;
-
-        // ALTERADO: Reorganização das opções de ordenação
-        case 6: // Ordenar por Número (critério 1)
+        // ALTERADO: Lógica de ordenação agora inclui o case 10
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
             printf("Deseja ordem:\n1. Crescente\n2. Decrescente\nEscolha: ");
             scanf("%d", &ordem);
             getchar();
-            exibirOrdenado(1, ordem);
+            // A fórmula 'opcao - 5' continua funcionando para todos os casos
+            exibirOrdenado(opcao - 5, ordem);
             break;
-
-        case 7: // Ordenar por Companhia (critério 2)
-            printf("Deseja ordem:\n1. Crescente\n2. Decrescente\nEscolha: ");
-            scanf("%d", &ordem);
-            getchar();
-            exibirOrdenado(2, ordem);
-            break;
-
-        case 8: // Ordenar por Destino (critério 3)
-            printf("Deseja ordem:\n1. Crescente\n2. Decrescente\nEscolha: ");
-            scanf("%d", &ordem);
-            getchar();
-            exibirOrdenado(3, ordem);
-            break;
-
-        case 9: // Ordenar por Horário (critério 4)
-            printf("Deseja ordem:\n1. Crescente\n2. Decrescente\nEscolha: ");
-            scanf("%d", &ordem);
-            getchar();
-            exibirOrdenado(4, ordem);
-            break;
-
         case 0:
             liberarMemoria();
             printf("Encerrando o programa.\n");
             break;
-
         default:
             printf("Opção inválida.\n");
         }
