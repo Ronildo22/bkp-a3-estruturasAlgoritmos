@@ -7,14 +7,14 @@ typedef struct Voo
     char numero[10];
     char companhiaAerea[50];
     char destino[50];
-    char horario[6];
+    char horario[6]; // 20:21\0
     char status[20];
     struct Voo *ant;
     struct Voo *prox;
 } Voo;
 
-Voo *inicio = NULL;
-Voo *fim = NULL;
+Voo *inicio;
+Voo *fim;
 
 Voo *criarVoo(char numero[], char companhiaAerea[], char destino[], char horario[], char status[])
 {
